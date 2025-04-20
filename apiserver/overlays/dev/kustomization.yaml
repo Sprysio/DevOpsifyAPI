@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+namespace: dev
+
+images:
+  - name: sprysio/simpleapi
+    newName: sprysio/simpleapi
+    newTag: v3
+
+secretGenerator:
+  - name: simpleapi-secret
+    literals:
+      - POSTGRES_HOST=postgres-svc

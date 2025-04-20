@@ -1,0 +1,7 @@
+\c BrainRot
+
+CREATE TABLE IF NOT EXISTS brain_rot (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255),
+  url VARCHAR(255)
+);
