@@ -1,0 +1,47 @@
+- name: Install and configure K3s
+  hosts: all
+  become: true
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  tasks:
+    - name: Wait for the apt lock to be released
+      ansible.builtin.shell: |
+        while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
+          sleep 1
+        done
+      changed_when: false
+
+    - name: Install required packages
+      ansible.builtin.apt:
+        name:
+          - curl
+          - wget
+          - gnupg
+          - lsb-release
+          - apt-transport-https
+          - software-properties-common
+          - ca-certificates
+          - git
+        state: present
+
+    - name: Download K3s installation script
+      ansible.builtin.get_url:
+        url: https://get.k3s.io
+        dest: /tmp/get_k3s.sh
+        mode: '0755'
+
+    - name: Install K3s
+      ansible.builtin.shell: |
+        /tmp/get_k3s.sh --write-kubeconfig-mode 644
+      args:
+        creates: /usr/local/bin/k3s
+
+    - name: Apply Ingress with dynamic IP
+      ansible.builtin.shell: |
+        set -euo pipefail
+        export VM_IP={{ ansible_host }}
+        envsubst < ~/simpleapi/base/ingress.yaml | kubectl apply -k ~/simpleapi/overlays/dev/
+      args:
+        executable: /bin/bash
+      register: apply_output
+      changed_when: "'configured' in apply_output.stdout"

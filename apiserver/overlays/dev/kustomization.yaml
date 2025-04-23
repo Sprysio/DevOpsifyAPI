@@ -14,4 +14,7 @@ images:
 secretGenerator:
   - name: simpleapi-secret
     literals:
-      - POSTGRES_HOST=postgres-svc
+      - POSTGRES_HOST=192.168.122.50
+      - POSTGRES_DB=BrainRot
+      - POSTGRES_USER=app_user
+      - POSTGRES_PASSWORD=pass

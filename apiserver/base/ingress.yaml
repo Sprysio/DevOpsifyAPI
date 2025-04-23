@@ -6,7 +6,7 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-  - host: simpleapi.example
+  - host: "${VM_IP}.nip.io"
     http:
       paths:
       - path: /
