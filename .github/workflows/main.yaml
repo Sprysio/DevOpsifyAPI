@@ -6,6 +6,7 @@ on:
       - 'main'
 
 env:
+  DOCKER_IMAGE: simpleapi
   VERSION: ${{ github.ref_name }}-${{ github.sha }}
 
 jobs:

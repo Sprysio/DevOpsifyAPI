@@ -48,18 +48,17 @@ This project demonstrates a complete DevOps workflow for deploying a Go-based ap
 
 - `apiserver/`: Kubernetes manifests for deploying the `simpleapi` application.
 - `infrastructure/`: Terraform and Ansible configurations for provisioning and configuring the VMs.
-- `sql/`: SQL scripts for initializing and populating the PostgreSQL database.
+- `sql/`: SQL scripts for initializing and populating the PostgreSQL database also config files for postgreSQL.
 - `.github/workflows/`: CI/CD pipelines for Docker image building and testing.
 - `main.go`: Source code for the `simpleapi` application.
 - `Dockerfile`: Instructions for containerizing the `simpleapi` application.
 
 ## Prerequisites
 
-- Terraform (>= 1.9.8)
-- Ansible
-- Docker
-- Kubernetes (K3s)
-- Go (>= 1.24)
+To run this project, you need the following tools installed on your local machine:
+
+- **Terraform**: For provisioning the virtual machines.
+- **Ansible**: For configuring the VMs and setting up the environment.
 
 ## How to Run
 
@@ -68,8 +67,12 @@ This project demonstrates a complete DevOps workflow for deploying a Go-based ap
    cd infrastructure/postgres-server
    terraform init
    terraform apply
+  ```
 
-   cd ../k3s-server
+After it finishes:
+
+  ```bash
+   cd infrastructure/k3s-server
    terraform init
    terraform apply
    ```

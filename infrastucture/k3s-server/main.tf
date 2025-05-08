@@ -18,7 +18,9 @@ resource "libvirt_volume" "k3s_data" {
 resource "libvirt_volume" "k3s_os" {
   name   = "${var.vm_name}-os"
   pool   = libvirt_pool.k3s_pool.name
-  source = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
+  #source = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
+  source = "/home/sprysio/simpleAPIgoDEVOPS/infrastucture/jammy-server-cloudimg-amd64.img"
+
   format = "qcow2"
 }
 
@@ -68,7 +70,9 @@ resource "libvirt_domain" "k3s_server" {
     command = <<EOT
       echo "Waiting 30 seconds for VM to initialize..."
       sleep 30
-
+      VM_IP=${self.network_interface.0.addresses.0}
+      ssh-keyscan -H $VM_IP >> ~/.ssh/known_hosts
+      
       rsync -avz -e "ssh -i ~/.ssh/id_rsa" ~/simpleAPIgoDEVOPS/apiserver ubuntu@$VM_IP:/home/ubuntu/
 
       ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \

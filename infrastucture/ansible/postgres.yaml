@@ -5,6 +5,12 @@
     postgres_version: 16
     postgres_password: "pass"
 
+  handlers:
+    - name: Restart postgresql
+      ansible.builtin.service:
+        name: postgresql
+        state: restarted
+
   tasks:
     - name: Wait for the apt lock to be released
       ansible.builtin.shell: |
@@ -64,25 +70,50 @@
         state: started
         enabled: true
 
-    - name: Create database and user (case-sensitive)
+    - name: Create database and user
       ansible.builtin.shell: |
-        sudo -u postgres psql -c "CREATE DATABASE \"BrainRot\";"
         sudo -u postgres psql -c "CREATE USER app_user WITH PASSWORD 'pass';"
-        sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE \"BrainRot\" TO app_user;"
+        sudo -u postgres psql -c "CREATE DATABASE \"BrainRot\" WITH OWNER app_user;"
       changed_when: false
 
     - name: Run SQL to create tables
-      become: true
-      become_user: postgres
-      become_method: ansible.builtin.sudo
-      community.postgresql.postgresql_query:
-        db: "BrainRot"
-        query: "{{ lookup('file', '/home/ubuntu/sql/00init_script.sql') }}"
+      ansible.builtin.shell: |
+        psql -h localhost -U app_user -d BrainRot -f /home/ubuntu/sql/00init_script.sql
+      environment:
+        PGPASSWORD: "pass"
+      args:
+        executable: /bin/bash
+      changed_when: false
+      no_log: true
+
+    - name: Grant privileges to app_user
+      ansible.builtin.shell: |
+        sudo -u postgres psql -d BrainRot <<EOF
+        GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO app_user;
+        GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO app_user;
+        ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO app_user;
+        EOF
+      changed_when: false
 
     - name: Run SQL to populate data
-      become: true
-      become_user: postgres
-      become_method: ansible.builtin.sudo
-      community.postgresql.postgresql_query:
-        db: "BrainRot"
-        query: "{{ lookup('file', '/home/ubuntu/sql/01populate_data.sql') }}"
+      ansible.builtin.shell: |
+        psql -h localhost -U app_user -d BrainRot -f /home/ubuntu/sql/01populate_data.sql
+      environment:
+        PGPASSWORD: "pass"
+      args:
+        executable: /bin/bash
+      changed_when: false
+      no_log: true
+
+    - name: Deploy custom configs
+      ansible.builtin.copy:
+        remote_src: true
+        src: "/home/ubuntu/sql/{{ item }}"
+        dest: "/etc/postgresql/{{ postgres_version }}/main/{{ item }}"
+        owner: postgres
+        group: postgres
+        mode: '0640'
+      loop:
+        - postgresql.conf
+        - pg_hba.conf
+      notify: Restart postgresql

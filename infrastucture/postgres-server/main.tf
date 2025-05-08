@@ -81,6 +81,7 @@ resource "libvirt_domain" "postgres_server" {
       done
       echo "SSH is up. Running Ansible..."
 
+      ssh-keyscan -H 192.168.122.50 >> ~/.ssh/known_hosts
       rsync -avz -e "ssh -i ~/.ssh/id_rsa" ~/simpleAPIgoDEVOPS/sql ubuntu@192.168.122.50:/home/ubuntu/
 
       ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \

@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: patch-ingress-ip
+spec:
+  template:
+    spec:
+      containers:
+      - name: patcher
+        image: bitnami/kubectl:latest
+        command:
+          - /bin/sh
+          - -c
+          - |
+            VM_IP=$(kubectl get configmap vm-ip-config -n dev -o jsonpath='{.data.vm_ip}')
+            kubectl patch ingress simpleapi-ingress -n dev \
+              --type='json' -p="[{'op': 'replace', 'path': '/spec/rules/0/host', 'value': 'apiserver.${VM_IP}.nip.io'}]"
+        env:
+          - name: KUBECONFIG
+            value: /root/.kube/config
+        volumeMounts:
+          - name: kubeconfig
+            mountPath: /root/.kube
+      restartPolicy: Never
+      volumes:
+        - name: kubeconfig
+          secret:
+            secretName: kubeconfig-secret
+  backoffLimit: 1
