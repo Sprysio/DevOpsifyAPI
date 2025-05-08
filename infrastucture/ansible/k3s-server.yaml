@@ -38,18 +38,6 @@
       args:
         creates: /usr/local/bin/k3s
 
-    - name: Create ConfigMap with VM IP
-      kubernetes.core.k8s:
-        state: present
-        definition:
-          apiVersion: v1
-          kind: ConfigMap
-          metadata:
-            name: vm-ip-config
-            namespace: dev
-          data:
-            vm_ip: "{{ ansible_host }}"
-
     - name: Install ArgoCD
       ansible.builtin.command: >
         helm install argocd argocd/argo-cd
@@ -79,3 +67,31 @@
         path: /etc/hosts
         line: "127.0.0.1 argocd.local"
         state: present
+    - name: Create dev namespace (if not exists)
+      ansible.builtin.shell: |
+        kubectl get ns dev || kubectl create ns dev
+      changed_when: false
+
+    - name: Create ConfigMap with VM IP using kubectl
+      ansible.builtin.shell: |
+        kubectl apply -f - <<EOF
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: vm-ip-config
+          namespace: dev
+        data:
+          vm_ip: "{{ ansible_host }}"
+        EOF
+      args:
+        executable: /bin/bash
+      changed_when: false
+
+    - name: Patch Ingress with dynamic VM IP
+      ansible.builtin.shell: |
+        VM_IP="{{ ansible_host }}"
+        kubectl patch ingress simpleapi-ingress -n dev \
+          --type='json' -p="[{'op': 'replace', 'path': '/spec/rules/0/host', 'value': 'apiserver.${VM_IP}.nip.io'}]"
+      args:
+        executable: /bin/bash
+      changed_when: false

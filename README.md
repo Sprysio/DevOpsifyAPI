@@ -68,9 +68,7 @@ To run this project, you need the following tools installed on your local machin
    terraform init
    terraform apply
   ```
-
 After it finishes:
-
   ```bash
    cd infrastructure/k3s-server
    terraform init
@@ -85,7 +83,7 @@ After it finishes:
 
 In Terraform output after creating VM for simpleapi its gonna return an IP, and app can be accessed by URL:
 ```
-http://IP.nip.io
+http://apiserver.IP.nip.io
 ```
 
 ## Features

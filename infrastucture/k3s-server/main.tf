@@ -73,7 +73,7 @@ resource "libvirt_domain" "k3s_server" {
       VM_IP=${self.network_interface.0.addresses.0}
       ssh-keyscan -H $VM_IP >> ~/.ssh/known_hosts
       
-      rsync -avz -e "ssh -i ~/.ssh/id_rsa" ~/simpleAPIgoDEVOPS/apiserver ubuntu@$VM_IP:/home/ubuntu/
+      rsync -avz -e "ssh -i ~/.ssh/id_rsa" ~/simpleAPIgoDEVOPS/argocd ubuntu@$VM_IP:/home/ubuntu/
 
       ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
         -i '${self.network_interface[0].addresses[0]},' \
