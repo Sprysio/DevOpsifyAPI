@@ -5,7 +5,4 @@ resources:
   - namespace.yaml
   - deployment.yaml
   - service.yaml
-  - patch-ingress.yaml
-
-patchesStrategicMerge:
   - ingress.yaml

@@ -38,6 +38,21 @@
       args:
         creates: /usr/local/bin/k3s
 
+    - name: Download Helm installation script
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+        dest: /tmp/get_helm.sh
+        mode: '0755'
+
+    - name: Install Helm
+      ansible.builtin.command: /tmp/get_helm.sh
+      args:
+        creates: /usr/local/bin/helm
+
+    - name: Add Argo, Grafana, and Prometheus repositories
+      ansible.builtin.command: helm repo add argocd https://argoproj.github.io/argo-helm
+      changed_when: false
+
     - name: Install ArgoCD
       ansible.builtin.command: >
         helm install argocd argocd/argo-cd
@@ -47,7 +62,7 @@
       changed_when: "'already exists' not in helm_argocd_install.stderr"
 
     - name: Apply ArgoCD command parameters making it http instead of https
-      ansible.builtin.command: kubectl apply -f {{ user_home }}/argocd/argocd-cmd-params-cm.yaml
+      ansible.builtin.command: kubectl apply -f {{ user_home }}/argocd/argocd-configmap.yaml
       changed_when: false
 
     - name: Restart ArgoCD server to apply changes
@@ -67,10 +82,6 @@
         path: /etc/hosts
         line: "127.0.0.1 argocd.local"
         state: present
-    - name: Create dev namespace (if not exists)
-      ansible.builtin.shell: |
-        kubectl get ns dev || kubectl create ns dev
-      changed_when: false
 
     - name: Create ConfigMap with VM IP using kubectl
       ansible.builtin.shell: |

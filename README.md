@@ -63,23 +63,23 @@ To run this project, you need the following tools installed on your local machin
 ## How to Run
 
 1. **Provision Infrastructure**:
-   ```bash
+```bash
    cd infrastructure/postgres-server
    terraform init
    terraform apply
-  ```
+```
 After it finishes:
+  
   ```bash
    cd infrastructure/k3s-server
    terraform init
    terraform apply
-   ```
-
-2. **Configure VMs:
+```
+2. **Configure VMs**:
 
 - VMs are gonna get configured by Ansible Playbook.
 
-3. Access the Application:
+3. **Access the Application**:
 
 In Terraform output after creating VM for simpleapi its gonna return an IP, and app can be accessed by URL:
 ```
