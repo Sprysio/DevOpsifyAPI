@@ -1,0 +1,5 @@
+- name: Create database and user
+  ansible.builtin.shell: |
+    sudo -u postgres psql -c "CREATE USER app_user WITH PASSWORD '{{ postgres_password }}';"
+    sudo -u postgres psql -c "CREATE DATABASE \"BrainRot\" WITH OWNER app_user;"
+  changed_when: false

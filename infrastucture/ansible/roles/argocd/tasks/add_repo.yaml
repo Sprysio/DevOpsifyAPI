@@ -1,0 +1,3 @@
+- name: Add ArgoCD repository
+  ansible.builtin.command: helm repo add argocd https://argoproj.github.io/argo-helm
+  changed_when: false

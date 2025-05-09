@@ -1,0 +1,38 @@
+- name: Wait for the apt lock to be released
+  ansible.builtin.import_tasks: apt_lock.yaml
+
+- name: Install required packages
+  ansible.builtin.import_tasks: install_dependencies.yaml
+
+- name: Add PostgreSQL signing key
+  ansible.builtin.import_tasks: add_signing_key.yaml
+
+- name: Wait for the apt lock to be released
+  ansible.builtin.import_tasks: apt_lock.yaml
+
+- name: Add PostgreSQL repository
+  ansible.builtin.import_tasks: add_repository.yaml
+
+- name: Wait for the apt lock to be released
+  ansible.builtin.import_tasks: apt_lock.yaml
+
+- name: Install PostgreSQL
+  ansible.builtin.import_tasks: install_postgresql.yaml
+
+- name: Ensure PostgreSQL is running
+  ansible.builtin.import_tasks: ensure_postgresql.yaml
+
+- name: Create database and user
+  ansible.builtin.import_tasks: create_db_and_user.yaml
+
+- name: Run SQL to create tables
+  ansible.builtin.import_tasks: run_init_sql.yaml
+
+- name: Grant privileges to app_user
+  ansible.builtin.import_tasks: grant_privileges.yaml
+
+- name: Run SQL to populate data
+  ansible.builtin.import_tasks: run_populate_sql.yaml
+
+- name: Deploy custom configs
+  ansible.builtin.import_tasks: deploy_custom_configs.yaml

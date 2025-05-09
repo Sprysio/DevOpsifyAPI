@@ -1,0 +1,12 @@
+- name: Deploy custom configs
+  ansible.builtin.copy:
+    remote_src: true
+    src: "/home/ubuntu/sql/{{ item }}"
+    dest: "/etc/postgresql/{{ postgres_version }}/main/{{ item }}"
+    owner: postgres
+    group: postgres
+    mode: '0640'
+  loop:
+    - postgresql.conf
+    - pg_hba.conf
+  notify: Restart postgresql

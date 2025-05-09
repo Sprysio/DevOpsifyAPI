@@ -1,0 +1,8 @@
+- name: Install required packages
+  ansible.builtin.import_tasks: install_dependencies.yaml
+
+- name: Install Helm
+  ansible.builtin.import_tasks: install_helm.yaml
+
+- name: Install K3s
+  ansible.builtin.import_tasks: install_k3s.yaml

@@ -17,8 +17,9 @@ resource "libvirt_pool" "postgres_pool" {
 resource "libvirt_volume" "postgres_os" {
   name   = "${var.vm_name}-os"
   pool   = libvirt_pool.postgres_pool.name
-  #source = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
-  source = "/home/sprysio/simpleAPIgoDEVOPS/infrastucture/jammy-server-cloudimg-amd64.img"
+  source = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
+  #source = "path/to/jammy-server-cloudimg-amd64.img"
+
   format = "qcow2"
 }
 
@@ -81,8 +82,8 @@ resource "libvirt_domain" "postgres_server" {
       done
       echo "SSH is up. Running Ansible..."
 
-      ssh-keyscan -H 192.168.122.50 >> ~/.ssh/known_hosts
-      rsync -avz -e "ssh -i ~/.ssh/id_rsa" ~/simpleAPIgoDEVOPS/sql ubuntu@192.168.122.50:/home/ubuntu/
+      ssh-keyscan -H 192.168.122.50 >> $HOME/.ssh/known_hosts
+      rsync -avz -e "ssh -i $HOME/.ssh/id_rsa" $HOME/simpleAPIgoDEVOPS/sql ubuntu@192.168.122.50:/home/ubuntu/
 
       ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
         -i '192.168.122.50,' \

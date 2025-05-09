@@ -1,0 +1,8 @@
+- name: Add ArgoCD repository
+  ansible.builtin.import_tasks: add_repo.yaml
+
+- name: Install ArgoCD
+  ansible.builtin.import_tasks: install_argocd.yaml
+
+- name: Configure ArgoCD
+  ansible.builtin.import_tasks: configure_argocd.yaml

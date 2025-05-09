@@ -1,0 +1,7 @@
+- name: Install ArgoCD
+  ansible.builtin.command: >
+    helm install argocd argocd/argo-cd
+    --namespace argocd
+    --create-namespace
+  register: helm_argocd_install
+  changed_when: "'already exists' not in helm_argocd_install.stderr"

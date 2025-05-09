@@ -1,0 +1,9 @@
+- name: Run SQL to populate data
+  ansible.builtin.shell: |
+    psql -h localhost -U app_user -d BrainRot -f /home/ubuntu/sql/01populate_data.sql
+  environment:
+    PGPASSWORD: "{{ postgres_password }}"
+  args:
+    executable: /bin/bash
+  changed_when: false
+  no_log: true

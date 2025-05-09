@@ -1,0 +1,2 @@
+- name: Wait for the apt lock to be released
+  ansible.builtin.import_tasks: apt_lock.yaml

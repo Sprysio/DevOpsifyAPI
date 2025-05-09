@@ -24,8 +24,8 @@ resource "libvirt_volume" "k3s_data" {
 resource "libvirt_volume" "k3s_os" {
   name   = "${var.vm_name}-os"
   pool   = libvirt_pool.k3s_pool.name
-  #source = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
-  source = "/home/sprysio/simpleAPIgoDEVOPS/infrastucture/jammy-server-cloudimg-amd64.img"
+  source = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
+  #source = "path/to/jammy-server-cloudimg-amd64.img"
 
   format = "qcow2"
 }
@@ -83,9 +83,9 @@ resource "libvirt_domain" "k3s_server" {
       done
       echo "SSH is up. Running Ansible..."
 
-      ssh-keyscan -H 192.168.122.100 >> ~/.ssh/known_hosts
+      ssh-keyscan -H 192.168.122.100 >> $HOME/.ssh/known_hosts
       
-      rsync -avz -e "ssh -i ~/.ssh/id_rsa" ~/simpleAPIgoDEVOPS/argocd ubuntu@192.168.122.100:/home/ubuntu/
+      rsync -avz -e "ssh -i $HOME/.ssh/id_rsa" $HOME/simpleAPIgoDEVOPS/argocd ubuntu@192.168.122.100:/home/ubuntu/
 
       ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
         -i '192.168.122.100,' \

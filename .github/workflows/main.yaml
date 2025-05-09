@@ -6,7 +6,7 @@ on:
       - 'main'
 
 env:
-  DOCKER_IMAGE: simpleapi
+  DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/simpleapi
   VERSION: ${{ github.ref_name }}-${{ github.sha }}
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
       - name: Build Docker image
         run: |
           docker buildx build --platform linux/amd64 --tag  \
-            ${{ env.DOCKER_IMAGE }}:${{ env.VERSION }} --push .
+          ${{ env.DOCKER_IMAGE }}:${{ env.VERSION }} --push .
 
       - name: Modify Kustomize image tag
         run: |

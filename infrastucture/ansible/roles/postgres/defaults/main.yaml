@@ -1,0 +1,2 @@
+postgres_version: 16
+postgres_password: "pass"

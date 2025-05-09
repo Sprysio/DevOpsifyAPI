@@ -1,6 +1,6 @@
 # SimpleAPI DevOps Project
 
-This project demonstrates a complete DevOps workflow for deploying a Go-based application (`simpleapi`) with a PostgreSQL database. It involves infrastructure provisioning, configuration management, containerization, and orchestration using modern tools like Terraform, Ansible, Docker, and Kubernetes.
+This project demonstrates a complete DevOps workflow for deploying a Go-based application (`simpleapi`) with a PostgreSQL database. It involves infrastructure provisioning, configuration management, containerization, and orchestration using modern tools like Terraform, Ansible, Docker, Kubernetes, and ArgoCD.
 
 ## Overview
 
@@ -12,14 +12,17 @@ This project demonstrates a complete DevOps workflow for deploying a Go-based ap
 ### Configuration Management
 - **Ansible** is used to configure the VMs:
   - The PostgreSQL VM is set up with the database and preloaded with initial data.
-  - The SimpleAPI VM is configured with Kubernetes (K3s) and prepared for application deployment.
+  - The SimpleAPI VM is configured with Kubernetes (K3s), ArgoCD, and networking for app deployment.
 
 ### Application
 - The `simpleapi` application is a Go-based REST API that connects to the PostgreSQL database to fetch and serve data.
 - The application is **Dockerized** for portability and ease of deployment.
 
 ### Orchestration
-- **Kubernetes** (via K3s) is used to deploy the `simpleapi` application on the SimpleAPI VM.
+- **Kubernetes (K3s)** is used to deploy the `simpleapi` application.
+- **ArgoCD** handles continuous delivery:
+  - The application is described in a Git repository using Kustomize.
+  - ArgoCD syncs the deployment automatically from Git.
 - The deployment includes:
   - A Kubernetes Deployment for the application.
   - A Service for internal communication.
@@ -33,11 +36,11 @@ This project demonstrates a complete DevOps workflow for deploying a Go-based ap
 2. **Configuration**:
    - Ansible playbooks in `infrastructure/ansible` install and configure:
      - PostgreSQL on the database VM.
-     - Kubernetes (K3s) on the application VM.
+     - Kubernetes (K3s) Cluster on the application VM.
 
 3. **Application Deployment**:
    - The `simpleapi` application is built and containerized using the provided `Dockerfile`.
-   - Kubernetes manifests in `apiserver` deploy the application to the Kubernetes cluster.
+   - Kubernetes manifests in the `apiserver/` directory are synced to the cluster by ArgoCD.
 
 4. **Continuous Integration**:
    - GitHub Actions workflows in `.github/workflows` automate:
@@ -59,6 +62,7 @@ To run this project, you need the following tools installed on your local machin
 
 - **Terraform**: For provisioning the virtual machines.
 - **Ansible**: For configuring the VMs and setting up the environment.
+- **Virtualization** (e.g., libvirt): Used by Terraform to create VMs.
 
 ## How to Run
 
@@ -77,20 +81,43 @@ After it finishes:
 ```
 2. **Configure VMs**:
 
-- VMs are gonna get configured by Ansible Playbook.
+VMs are configured automatically during provisioning using Ansible playbooks.
 
 3. **Access the Application**:
 
-In Terraform output after creating VM for simpleapi its gonna return an IP, and app can be accessed by URL:
+After deployment is complete, the API is available at:
 ```
-http://apiserver.IP.nip.io
+http://apiserver.192.168.122.100.nip.io/brainrot
+```
+
+4. **Access ArgoCD Dashboard**
+
+Add the following entry to your `/etc/hosts` file to resolve the domain locally:
+
+```
+192.168.122.100 argocd.local
+```
+
+You can access the ArgoCD web UI at:
+
+```
+http://argocd.local
+```
+
+Use admin as the username and retrieve the initial password.  To retrieve the initial password, run the provided script on the `k3s_app` VM: 
+
+```
+ubuntu@ubuntu:~$ cd argocd/
+ubuntu@ubuntu:~/argocd$ chmod +x passwordCheck.sh 
+ubuntu@ubuntu:~/argocd$ ./passwordCheck.sh 
 ```
 
 ## Features
 - Automated infrastructure provisioning with Terraform.
 - Configuration management with Ansible.
 - Containerized Go application with Docker.
-- Kubernetes-based orchestration for scalability and reliability.
+- Kubernetes-based deployment with K3s.
+- GitOps workflow with ArgoCD.
 - CI/CD pipelines for automated testing and deployment.
 
 ## License

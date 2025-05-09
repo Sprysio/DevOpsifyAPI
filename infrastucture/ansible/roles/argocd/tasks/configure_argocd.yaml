@@ -1,0 +1,21 @@
+- name: Apply ArgoCD command parameters making it http instead of https
+  ansible.builtin.command: kubectl apply -f {{ user_home }}/argocd/argocd-configmap.yaml
+  changed_when: false
+
+- name: Apply ArgoCD ingress
+  ansible.builtin.command: kubectl apply -f {{ user_home }}/argocd/argocd-ingress.yaml
+  changed_when: false
+
+- name: Apply ArgoCD applications
+  ansible.builtin.command: kubectl apply -f "{{ user_home }}/argocd/apiserver.yaml"
+  changed_when: false
+
+- name: Restart ArgoCD server to apply changes
+  ansible.builtin.command: kubectl -n argocd rollout restart deployment/argocd-server
+  changed_when: false
+
+- name: Add argocd.local to /etc/hosts
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "127.0.0.1 argocd.local"
+    state: present

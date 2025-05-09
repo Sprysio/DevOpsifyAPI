@@ -1,0 +1,9 @@
+- name: Run SQL to create tables
+  ansible.builtin.shell: |
+    psql -h localhost -U app_user -d BrainRot -f /home/ubuntu/sql/00init_script.sql
+  environment:
+    PGPASSWORD: "{{ postgres_password }}"
+  args:
+    executable: /bin/bash
+  changed_when: false
+  no_log: true

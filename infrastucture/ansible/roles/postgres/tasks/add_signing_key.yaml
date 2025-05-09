@@ -1,0 +1,4 @@
+- name: Add PostgreSQL signing key
+  ansible.builtin.apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    state: present
