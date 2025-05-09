@@ -65,10 +65,6 @@
       ansible.builtin.command: kubectl apply -f {{ user_home }}/argocd/argocd-configmap.yaml
       changed_when: false
 
-    - name: Restart ArgoCD server to apply changes
-      ansible.builtin.command: kubectl -n argocd rollout restart deployment/argocd-server
-      changed_when: false
-
     - name: Apply ArgoCD ingress
       ansible.builtin.command: kubectl apply -f {{ user_home }}/argocd/argocd-ingress.yaml
       changed_when: false
@@ -77,32 +73,12 @@
       ansible.builtin.command: kubectl apply -f "{{ user_home }}/argocd/apiserver.yaml"
       changed_when: false
 
+    - name: Restart ArgoCD server to apply changes
+      ansible.builtin.command: kubectl -n argocd rollout restart deployment/argocd-server
+      changed_when: false
+
     - name: Add argocd.local to /etc/hosts
       ansible.builtin.lineinfile:
         path: /etc/hosts
         line: "127.0.0.1 argocd.local"
         state: present
-
-    - name: Create ConfigMap with VM IP using kubectl
-      ansible.builtin.shell: |
-        kubectl apply -f - <<EOF
-        apiVersion: v1
-        kind: ConfigMap
-        metadata:
-          name: vm-ip-config
-          namespace: dev
-        data:
-          vm_ip: "{{ ansible_host }}"
-        EOF
-      args:
-        executable: /bin/bash
-      changed_when: false
-
-    - name: Patch Ingress with dynamic VM IP
-      ansible.builtin.shell: |
-        VM_IP="{{ ansible_host }}"
-        kubectl patch ingress simpleapi-ingress -n dev \
-          --type='json' -p="[{'op': 'replace', 'path': '/spec/rules/0/host', 'value': 'apiserver.${VM_IP}.nip.io'}]"
-      args:
-        executable: /bin/bash
-      changed_when: false

@@ -27,3 +27,8 @@ variable "ssh_public_key" {
   description = "Path to SSH public key"
   default     = "~/.ssh/id_rsa.pub"
 }
+
+variable "static_ip" {
+  description = "Static IP address for the VM"
+  default     = "192.168.122.100"
+}

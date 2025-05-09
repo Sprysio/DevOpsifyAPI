@@ -54,7 +54,7 @@ resource "libvirt_domain" "postgres_server" {
 
   network_interface {
     network_name = "default"
-    addresses    = ["192.168.122.50"]
+    addresses = ["${var.static_ip}"]
   }
 
   disk {

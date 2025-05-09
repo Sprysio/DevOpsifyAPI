@@ -5,14 +5,21 @@ users:
     shell: /bin/bash
     ssh_authorized_keys:
       - ${ssh_public_key}
-    lock_passwd: false
-    passwd: "$6$rounds=4096$NQ.EmJrG$XKQjJ5TttVxQfU.5UO7J3G8DnT.HB9rQ8Lb1ZqXW7sS9zYtQW6rO1jW5d4KvX3hL6sPxY7fB2VcE4N" # ubuntu
+    
+hostname: ubuntu
 
-ssh_pwauth: false
-chpasswd:
-  list: |
-    ubuntu:ubuntu
-  expire: false
+write_files:
+  - path: /etc/netplan/01-netcfg.yaml
+    content: |
+      network:
+        version: 2
+        ethernets:
+          ens3:
+            dhcp4: false
+            addresses: [192.168.122.100/24]
+            gateway4: 192.168.122.1
+            nameservers:
+              addresses: [8.8.8.8, 8.8.4.4]
 
 package_update: true
 package_upgrade: true
@@ -20,8 +27,10 @@ packages:
   - qemu-guest-agent
 
 runcmd:
+  - netplan generate
+  - netplan apply
+  - systemctl restart systemd-networkd
   - systemctl enable qemu-guest-agent
   - systemctl start qemu-guest-agent
   - sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config
   - systemctl restart sshd
-  
