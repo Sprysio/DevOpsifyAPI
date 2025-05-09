@@ -7,9 +7,6 @@ on:
 
 jobs:
   unit-test:
-    if: |
-      startsWith(github.head_ref, 'feature/') || 
-      startsWith(github.head_ref, 'bugfix/')
     name: Unit Tests
     runs-on: ubuntu-latest
 

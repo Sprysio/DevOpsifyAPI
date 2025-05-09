@@ -1,4 +1,4 @@
-# SimpleAPI DevOps Project
+# DevOpsifyAPI Project
 
 This project demonstrates a complete DevOps workflow for deploying a Go-based application (`simpleapi`) with a PostgreSQL database. It involves infrastructure provisioning, configuration management, containerization, and orchestration using modern tools like Terraform, Ansible, Docker, Kubernetes, and ArgoCD.
 
