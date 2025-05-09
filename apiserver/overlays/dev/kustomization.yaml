@@ -9,7 +9,7 @@ namespace: dev
 images:
   - name: sprysio/simpleapi
     newName: sprysio/simpleapi
-    newTag: v3
+    newTag: main-4a9c54e0f1a19d05d3933b97e0b997d90ab9fbe6
 
 secretGenerator:
   - name: simpleapi-secret
